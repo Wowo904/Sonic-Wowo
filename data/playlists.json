@@ -1,0 +1,4 @@
+[
+  { "id": "favorites", "name": "我的收藏", "songs": [] },
+  { "id": "visual-set", "name": "视觉歌单", "songs": [] }
+]

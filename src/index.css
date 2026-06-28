@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+.player-progress-range {
+  appearance: none;
+  background: transparent;
+  color: var(--player-accent);
+}
+
+.player-progress-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--player-accent) 0%,
+    var(--player-accent) var(--player-progress),
+    rgba(255, 255, 255, 0.1) var(--player-progress),
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  box-shadow: 0 0 10px color-mix(in srgb, var(--player-accent) 50%, transparent);
+}
+
+.player-progress-range::-webkit-slider-thumb {
+  appearance: none;
+  width: 10px;
+  height: 10px;
+  margin-top: -3px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 9999px;
+  background: var(--player-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--player-accent) 70%, transparent);
+  transition: transform 80ms ease, box-shadow 80ms ease;
+}
+
+.player-progress-range:hover::-webkit-slider-thumb,
+.player-progress-range:focus-visible::-webkit-slider-thumb {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--player-accent) 85%, transparent);
+}
+
+.player-progress-range::-moz-range-track {
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.player-progress-range::-moz-range-progress {
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--player-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--player-accent) 50%, transparent);
+}
+
+.player-progress-range::-moz-range-thumb {
+  width: 10px;
+  height: 10px;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  border-radius: 9999px;
+  background: var(--player-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--player-accent) 70%, transparent);
+}
