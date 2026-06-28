@@ -113,15 +113,6 @@ export function UI({ theme, onThemeChange }: UIProps) {
   const [importingPlaylistId, setImportingPlaylistId] = useState<number | null>(null);
   const [playlistImportStatus, setPlaylistImportStatus] = useState('');
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
-  const [settingsUID, setSettingsUID] = useState(() => window.localStorage.getItem('sonic-topography-netease-uid') || '');
-  const [cookieMusicU, setCookieMusicU] = useState('');
-  const [cookieCsrf, setCookieCsrf] = useState('');
-  const [cookieNmtid, setCookieNmtid] = useState('');
-  const [cookieHasValue, setCookieHasValue] = useState(false);
-  const [cookieSaved, setCookieSaved] = useState(false);
-  const [cookieError, setCookieError] = useState('');
-  const [cookieAccountInfo, setCookieAccountInfo] = useState('');
-  const [settingsSaved, setSettingsSaved] = useState(false);
 
   const hasLoadedPlaylistsRef = useRef(false);
   const importingRef = useRef(false);
@@ -143,27 +134,6 @@ export function UI({ theme, onThemeChange }: UIProps) {
     syncPlaylists();
   }, [playlists]);
 
-  // Load cookie status when settings panel opens
-  useEffect(() => {
-    if (activePanel === 'settings') {
-      fetch(apiUrl('/api/settings/cookie'))
-        .then(r => r.json())
-        .then(d => {
-          setCookieHasValue(d.hasCookie);
-          if (d.hasCookie && !cookieMusicU) {
-            // Try to parse existing cookie into fields
-            const cookieStr = d.preview.replace('...', '') || '';
-            const muMatch = cookieStr.match(/MUSIC_U=([^;]+)/);
-            const csrfMatch = cookieStr.match(/__csrf=([^;]+)/);
-            const nmMatch = cookieStr.match(/NMTID=([^;]+)/);
-            if (muMatch) setCookieMusicU(muMatch[1]);
-            if (csrfMatch) setCookieCsrf(csrfMatch[1]);
-            if (nmMatch) setCookieNmtid(nmMatch[1]);
-          }
-        })
-        .catch(() => {});
-    }
-  }, [activePanel, cookieMusicU]);
 
   useEffect(() => {
     const loadPlaylists = async () => {
@@ -892,7 +862,7 @@ export function UI({ theme, onThemeChange }: UIProps) {
         onMouseEnter={() => setSidebarHovered(true)}
         onMouseLeave={() => setSidebarHovered(false)}
       >
-        <aside className={`absolute left-0 top-0 w-[60px] h-full border-r border-white/[0.04] flex flex-col items-center py-6 pointer-events-auto transition-all duration-400 ease-[cubic-bezier(0.22,0.61,0.36,1)] ${sidebarPinned ? 'translate-x-0' : '-translate-x-full group-hover:translate-x-0'}`} style={{ background: 'rgba(8,12,22,0.25)', backdropFilter: 'blur(64px) saturate(200%)', WebkitBackdropFilter: 'blur(64px) saturate(200%)', boxShadow: 'inset -1px 0 0 rgba(255,255,255,0.04)' }}>
+        <aside className={`absolute left-0 top-0 w-[60px] h-full border-r border-white/[0.04] flex flex-col items-center py-6 pointer-events-auto transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${sidebarPinned ? 'translate-x-0' : '-translate-x-full group-hover:translate-x-0'}`} style={{ background: 'rgba(8,14,26,0.18)', backdropFilter: 'blur(80px) saturate(180%)', WebkitBackdropFilter: 'blur(80px) saturate(180%)', boxShadow: 'inset -1px 0 0 rgba(255,255,255,0.05), 4px 0 30px rgba(0,0,0,0.3)' }}>
           <button className="uppercase tracking-[0.2em] text-[10px] mb-12 opacity-100 transition-opacity cursor-pointer" style={{ writingMode: 'vertical-rl', color: accentHex }}>可视化</button>
           <button onClick={() => setActivePanel(activePanel === 'freq' ? null : 'freq')} className={`uppercase tracking-[0.2em] text-[10px] mb-12 transition-opacity cursor-pointer flex items-center justify-center gap-2 ${activePanel === 'freq' ? 'opacity-100 scale-100' : 'opacity-40 hover:opacity-100'}`} style={{ writingMode: 'vertical-rl' }}>
             触发器
@@ -986,11 +956,10 @@ export function UI({ theme, onThemeChange }: UIProps) {
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 6, transition: { duration: 0.18 } }}
-            transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8, transition: { duration: 0.2, ease: 'easeIn' } }}
+            transition={{ type: 'spring', stiffness: 320, damping: 26 }}
             className="absolute top-[40px] left-[100px] w-[360px] max-h-[70vh] z-50 pointer-events-auto backdrop-blur-3xl border border-white/[0.07] rounded-2xl overflow-hidden shadow-2xl shadow-black/30"
-            style={{ background: 'rgba(10,15,28,0.28)', backdropFilter: 'blur(64px) saturate(200%)', WebkitBackdropFilter: 'blur(64px) saturate(200%)', boxShadow: '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)' }}
+            style={{ background: 'rgba(8,14,26,0.22)', backdropFilter: 'blur(80px) saturate(180%)', WebkitBackdropFilter: 'blur(80px) saturate(180%)', boxShadow: '0 8px 40px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)' }}
           >
           <div className="p-5 border-b border-white/[0.06]">
             <div className="flex items-center justify-between mb-4">
@@ -1211,10 +1180,10 @@ export function UI({ theme, onThemeChange }: UIProps) {
           initial={{ opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -16, transition: { duration: 0.18 } }}
-          transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+          transition={{ type: 'spring', stiffness: 280, damping: 24 }}
           transition={{ duration: 0.25, ease: 'easeOut' }}
           className="absolute top-[40px] left-[100px] w-[380px] max-h-[78vh] z-50 pointer-events-auto backdrop-blur-3xl border border-white/[0.07] rounded-2xl overflow-hidden shadow-2xl shadow-black/30"
-          style={{ background: 'rgba(10,15,28,0.28)', backdropFilter: 'blur(64px) saturate(200%)', WebkitBackdropFilter: 'blur(64px) saturate(200%)', boxShadow: '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)' }}
+          style={{ background: 'rgba(8,14,26,0.22)', backdropFilter: 'blur(80px) saturate(180%)', WebkitBackdropFilter: 'blur(80px) saturate(180%)', boxShadow: '0 8px 40px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)' }}
         >
           <div className="p-6 border-b border-white/[0.06] flex items-start justify-between">
             <div>
@@ -1269,7 +1238,7 @@ export function UI({ theme, onThemeChange }: UIProps) {
       )}
 
       {songToAdd && (
-        <div className="absolute top-[120px] left-[480px] w-[280px] z-[70] pointer-events-auto backdrop-blur-2xl border border-white/[0.06] rounded-xl overflow-hidden" style={{ background: 'rgba(10,15,28,0.28)', backdropFilter: 'blur(64px) saturate(200%)', WebkitBackdropFilter: 'blur(64px) saturate(200%)', boxShadow: '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
+        <div className="absolute top-[120px] left-[480px] w-[280px] z-[70] pointer-events-auto backdrop-blur-2xl border border-white/[0.06] rounded-xl overflow-hidden" style={{ background: 'rgba(8,14,26,0.22)', backdropFilter: 'blur(80px) saturate(180%)', WebkitBackdropFilter: 'blur(80px) saturate(180%)', boxShadow: '0 8px 40px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
           <div className="p-5 border-b border-white/[0.06]">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -1323,178 +1292,32 @@ export function UI({ theme, onThemeChange }: UIProps) {
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 6, transition: { duration: 0.18 } }}
-            transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8, transition: { duration: 0.2, ease: 'easeIn' } }}
             transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-            className="absolute top-[40px] left-[100px] w-[380px] max-h-[78vh] z-50 pointer-events-auto backdrop-blur-3xl border border-white/[0.07] rounded-2xl overflow-hidden shadow-2xl shadow-black/30"
-            style={{ background: 'rgba(10,15,28,0.28)', backdropFilter: 'blur(64px) saturate(200%)', WebkitBackdropFilter: 'blur(64px) saturate(200%)', boxShadow: '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)' }}
+            className="absolute top-[40px] left-[100px] w-[300px] max-h-[78vh] z-50 pointer-events-auto backdrop-blur-3xl border border-white/[0.07] rounded-2xl overflow-hidden shadow-2xl shadow-black/30"
+            style={{ background: 'rgba(8,14,26,0.22)', backdropFilter: 'blur(80px) saturate(180%)', WebkitBackdropFilter: 'blur(80px) saturate(180%)', boxShadow: '0 8px 40px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)' }}
           >
-          <div className="p-5 border-b border-white/[0.06]">
+          <div className="p-5">
             <div className="flex items-center justify-between mb-4">
               <div className="text-[12px] uppercase tracking-[0.2em] text-white/70 flex items-center gap-2">
-                <Settings size={14} /> 网易云设置
+                <Settings size={14} /> 设置
               </div>
               <button onClick={() => setActivePanel(null)} className="text-[10px] uppercase tracking-[0.15em] text-white/40 hover:text-white">关闭</button>
             </div>
-
-            {/* UID Section */}
-            <div className="mb-5">
-              <div className="text-[10px] uppercase tracking-[0.15em] text-white/40 mb-2">用户 UID</div>
-              <div className="flex gap-2">
-                <input
-                  value={settingsUID}
-                  onChange={(e) => {
-                    setSettingsUID(e.target.value);
-                    setSettingsSaved(false);
-                  }}
-                  placeholder="输入 UID，如 12345678"
-                  className="min-w-0 flex-1 bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-[12px] text-white outline-none focus:border-white/30 transition-colors"
-                />
-                <button
-                  onClick={() => {
-                    window.localStorage.setItem('sonic-topography-netease-uid', settingsUID.trim());
-                    setNeteaseUID(settingsUID.trim());
-                    setSettingsSaved(true);
-                    setTimeout(() => setSettingsSaved(false), 2000);
-                  }}
-                  className="px-4 py-2 text-[10px] uppercase tracking-[0.1em] text-black rounded-lg disabled:opacity-50 whitespace-nowrap transition-all"
-                  style={{ backgroundColor: settingsSaved ? '#22c55e' : accentHex }}
-                >
-                  {settingsSaved ? '已保存 ✓' : '保存'}
-                </button>
-              </div>
-              <button
-                onClick={autoDetectUID}
-                disabled={isFetchingPlaylists}
-                className="mt-2 w-full py-1.5 text-[10px] uppercase tracking-[0.1em] rounded-lg border border-white/[0.08] text-white/50 hover:text-white hover:border-white/20 disabled:opacity-50 transition-colors"
-              >
-                自动获取 UID
-              </button>
-            </div>
-
-            {/* Cookie 配置 */}
-            <div className="mb-5 pt-4 border-t border-white/[0.06]">
-              <div className="text-[10px] uppercase tracking-[0.15em] text-white/40 mb-2">网易云 Cookie</div>
-              <div className="flex items-center gap-2 mb-3">
-                <span className={`w-2 h-2 rounded-full ${cookieHasValue ? 'bg-green-400/80' : 'bg-white/20'}`} />
-                <span className="text-[11px] text-white/50">{cookieHasValue ? '已配置' : '未配置'}</span>
-              </div>
-              <div className="space-y-2">
-                <div>
-                  <div className="text-[9px] uppercase tracking-[0.1em] text-white/25 mb-1">MUSIC_U</div>
-                  <input
-                    value={cookieMusicU}
-                    onChange={(e) => { setCookieMusicU(e.target.value); setCookieSaved(false); setCookieError(''); setCookieAccountInfo(''); }}
-                    placeholder="从浏览器 Cookie 复制"
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-[11px] text-white outline-none focus:border-white/30 transition-colors"
-                  />
-                </div>
-                <div>
-                  <div className="text-[9px] uppercase tracking-[0.1em] text-white/25 mb-1">__csrf</div>
-                  <input
-                    value={cookieCsrf}
-                    onChange={(e) => { setCookieCsrf(e.target.value); setCookieSaved(false); setCookieError(''); setCookieAccountInfo(''); }}
-                    placeholder="安全令牌"
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-[11px] text-white outline-none focus:border-white/30 transition-colors"
-                  />
-                </div>
-                <div>
-                  <div className="text-[9px] uppercase tracking-[0.1em] text-white/25 mb-1">NMTID</div>
-                  <input
-                    value={cookieNmtid}
-                    onChange={(e) => { setCookieNmtid(e.target.value); setCookieSaved(false); setCookieError(''); setCookieAccountInfo(''); }}
-                    placeholder="设备标识"
-                    className="w-full bg-white/[0.04] border border-white/[0.08] rounded-lg px-3 py-2 text-[11px] text-white outline-none focus:border-white/30 transition-colors"
-                  />
-                </div>
-                {cookieError && (
-                  <p className="text-[10px] text-red-400/80 mt-1">{cookieError}</p>
-                )}
-                <button
-                  onClick={async () => {
-                    setCookieError('');
-                    const mu = cookieMusicU.trim();
-                    const csrf = cookieCsrf.trim();
-                    const nmtid = cookieNmtid.trim();
-                    
-                    // Validate all 3 fields
-                    if (!mu) { setCookieError('请填写 MUSIC_U'); return; }
-                    if (!csrf) { setCookieError('请填写 __csrf'); return; }
-                    if (!nmtid) { setCookieError('请填写 NMTID'); return; }
-                    
-                    try {
-                      const cookie = `MUSIC_U=${mu}; __csrf=${csrf}; NMTID=${nmtid}`;
-                      await fetch(apiUrl('/api/settings/cookie'), {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ cookie }),
-                      });
-                      setCookieSaved(true);
-                      setCookieHasValue(true);
-                      setCookieAccountInfo('正在验证...');
-                      
-                      // Verify cookie by checking account
-                      try {
-                        const acctRes = await fetch(apiUrl('/api/netease/user/account'));
-                        const acctData = await acctRes.json();
-                        if (acctData?.nickname) {
-                          setCookieAccountInfo(`✓ Cookie 有效 (${acctData.nickname})`);
-                        } else {
-                          setCookieAccountInfo('⚠ Cookie 已保存但可能无效，请检查');
-                        }
-                      } catch {
-                        setCookieAccountInfo('⚠ 无法验证，请手动测试搜索');
-                      }
-                      
-                      setTimeout(() => { setCookieSaved(false); setCookieAccountInfo(''); }, 3000);
-                    } catch {
-                      setCookieError('保存失败，请重试');
-                    }
-                  }}
-                  className="w-full py-2 text-[10px] uppercase tracking-[0.1em] text-black rounded-lg disabled:opacity-50 transition-all mt-1"
-                  style={{ backgroundColor: cookieSaved ? '#22c55e' : accentHex }}
-                >
-                  {cookieSaved ? '已保存 ✓' : '保存 Cookie'}
-                </button>
-                {cookieAccountInfo && (
-                  <p className={`text-[10px] mt-1.5 ${cookieAccountInfo.startsWith('✓') ? 'text-green-400/80' : 'text-yellow-400/80'}`}>{cookieAccountInfo}</p>
-                )}
-                <button
-                  onClick={async () => {
-                    setCookieMusicU('');
-                    setCookieCsrf('');
-                    setCookieNmtid('');
-                    setCookieHasValue(false);
-                    try {
-                      await fetch(apiUrl('/api/settings/cookie'), {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ cookie: '' }),
-                      });
-                      setCookieSaved(true);
-                      setTimeout(() => setCookieSaved(false), 2000);
-                    } catch {}
-                  }}
-                  className="w-full py-2 text-[10px] uppercase tracking-[0.1em] rounded-lg transition-all mt-1 border border-white/10 text-white/40 hover:text-white hover:border-white/20"
-                >
-                  清除 Cookie
-                </button>
-              </div>
-              <p className="mt-2 text-[10px] text-white/25 leading-relaxed">
-                浏览器登录 music.163.com → F12 → Application → Cookies → 分别复制三个值，保存后自动检测，无需重启。
+            <div className="text-[11px] text-white/40 leading-relaxed space-y-3">
+              <p>Cookie 在源文件中修改：</p>
+              <p className="bg-white/[0.04] border border-white/[0.06] rounded-lg px-3 py-2 font-mono text-white/35 text-[10px] break-all">
+                ~/Library/Application Support/sonic-topography/.env.local
               </p>
+              <p className="text-white/25">格式：NETEASE_COOKIE=MUSIC_U=xxx; __csrf=xxx; NMTID=xxx</p>
+              <p className="text-white/25">修改后重启 App。</p>
             </div>
-
-            {/* Divider */}
-            <div className="border-t border-white/[0.06] my-4" />
-
-
-
-            <div className="mt-5 pt-4 border-t border-white/[0.04] text-[10px] text-white/25 leading-relaxed">
+            <div className="mt-5 pt-4 border-t border-white/[0.04] text-[10px] text-white/25">
               Sonic Topography · ALEX-W. &copy; 2026
             </div>
           </div>
           </motion.div>
+
         )}
       </AnimatePresence>
 
@@ -1503,11 +1326,10 @@ export function UI({ theme, onThemeChange }: UIProps) {
           <motion.div
             initial={{ opacity: 0, scale: 0.96, y: 12 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.97, y: 6, transition: { duration: 0.18 } }}
-            transition={{ type: 'spring', stiffness: 380, damping: 32 }}
-            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            exit={{ opacity: 0, scale: 0.96, y: 8, transition: { duration: 0.2, ease: 'easeIn' } }}
+            transition={{ type: 'spring', stiffness: 320, damping: 26 }}
             className="absolute top-[40px] left-[100px] w-[420px] max-h-[74vh] z-[65] pointer-events-auto backdrop-blur-3xl border border-white/[0.07] rounded-2xl overflow-hidden shadow-2xl shadow-black/30"
-            style={{ background: 'rgba(10,15,28,0.28)', backdropFilter: 'blur(64px) saturate(200%)', WebkitBackdropFilter: 'blur(64px) saturate(200%)', boxShadow: '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)' }}
+            style={{ background: 'rgba(8,14,26,0.22)', backdropFilter: 'blur(80px) saturate(180%)', WebkitBackdropFilter: 'blur(80px) saturate(180%)', boxShadow: '0 8px 40px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)' }}
           >
           <div className="p-5 border-b border-white/[0.06]">
             <div className="flex items-center justify-between mb-4">
@@ -1631,8 +1453,8 @@ export function UI({ theme, onThemeChange }: UIProps) {
       </AnimatePresence>
 
       {pendingDelete && (
-        <div className="absolute inset-0 z-[120] pointer-events-auto flex items-center justify-center bg-black/40 backdrop-blur-lg">
-          <div className="w-[320px] border border-white/[0.06] rounded-sm p-5" style={{ background: 'rgba(10,15,28,0.28)', backdropFilter: 'blur(64px) saturate(200%)', WebkitBackdropFilter: 'blur(64px) saturate(200%)', boxShadow: '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
+        <div className="absolute inset-0 z-[120] pointer-events-auto flex items-center justify-center bg-black/50 backdrop-blur-xl">
+          <div className="w-[320px] border border-white/[0.06] rounded-sm p-5" style={{ background: 'rgba(8,14,26,0.22)', backdropFilter: 'blur(80px) saturate(180%)', WebkitBackdropFilter: 'blur(80px) saturate(180%)', boxShadow: '0 8px 40px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
             <div className="text-[12px] uppercase tracking-[0.2em] text-white/70 mb-3">
               确认删除
             </div>
@@ -1659,7 +1481,7 @@ export function UI({ theme, onThemeChange }: UIProps) {
 
       {/* Player Panel */}
       {trackName !== '未选择曲目' && (
-        <div className="absolute top-[88px] right-[40px] w-[340px] p-6 rounded-sm z-50 pointer-events-auto backdrop-blur-2xl border border-white/[0.06]" style={{ background: 'rgba(10,15,28,0.28)', backdropFilter: 'blur(64px) saturate(200%)', WebkitBackdropFilter: 'blur(64px) saturate(200%)', boxShadow: '0 4px 24px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
+        <div className="absolute top-[88px] right-[40px] w-[340px] p-6 rounded-sm z-50 pointer-events-auto backdrop-blur-2xl border border-white/[0.06]" style={{ background: 'rgba(8,14,26,0.22)', backdropFilter: 'blur(80px) saturate(180%)', WebkitBackdropFilter: 'blur(80px) saturate(180%)', boxShadow: '0 8px 40px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)' }}>
           <div className="flex justify-between items-start mb-1">
             <div className="text-[18px] font-light tracking-[0.05em] text-white truncate" title={trackName}>
               {trackName}
@@ -2008,7 +1830,7 @@ function FreqTriggerPanel({ action, setAction, onClose, accentHex }: { action: '
       initial={{ opacity: 0, scale: 0.96 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.96 }}
-      transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24 }}
       className="absolute inset-0 z-[100] backdrop-blur-md bg-black/50 flex flex-col items-center justify-center pointer-events-auto">
       <div className="w-[80vw] max-w-[800px] border border-white/[0.06] rounded-2xl p-8 shadow-2xl" style={{ background: 'rgba(10,15,28,0.45)', backdropFilter: 'blur(48px) saturate(220%)', WebkitBackdropFilter: 'blur(48px) saturate(220%)' }}>
           <div className="flex justify-between items-center mb-6">
