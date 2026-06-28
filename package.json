@@ -61,9 +61,6 @@
     "vite": "^6.2.3"
   },
   "devDependencies": {
-    "@capacitor/cli": "^8.4.1",
-    "@capacitor/core": "^8.4.1",
-    "@capacitor/ios": "^8.4.1",
     "@types/express": "^4.17.21",
     "@types/jsmediatags": "^3.9.6",
     "@types/node": "^22.14.0",
